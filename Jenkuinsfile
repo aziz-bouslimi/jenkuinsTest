@@ -1,0 +1,57 @@
+pipeline {
+    agent any  // Utiliser n'importe quel agent disponible
+
+    environment {
+        // Environnement global pour Jenkins (par exemple, chemin vers gcc ou autres outils)
+        MAKE = 'make'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Clonage du dépôt Git...'
+                git 'https://github.com/tonutilisateur/MonProjetC.git'  // Remplace par l'URL de ton dépôt Git
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Compilation du projet...'
+                script {
+                    // Exécuter le Makefile pour compiler l'application
+                    sh "${MAKE}"
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Exécution des tests...'
+                script {
+                    // Exécuter la cible 'test' définie dans le Makefile pour lancer les tests unitaires
+                    sh "${MAKE} test"
+                }
+            }
+        }
+
+        stage('Clean') {
+            steps {
+                echo 'Nettoyage des fichiers générés...'
+                script {
+                    // Nettoyer les artefacts générés après le build
+                    sh "${MAKE} clean"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Le build et les tests ont réussi !'
+        }
+        failure {
+            echo 'Le build ou les tests ont échoué.'
+        }
+    }
+}
+
